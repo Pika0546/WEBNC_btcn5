@@ -1,6 +1,6 @@
 
 import React from 'react'
-import { BrowserRouter,Route, Routes } from 'react-router-dom';
+import { BrowserRouter,HashRouter,Route, Routes } from 'react-router-dom';
 import './App.css';
 import {QueryClient, QueryClientProvider } from 'react-query'
 
@@ -25,7 +25,7 @@ const App = () => {
 			}}
 		>
 			<QueryClientProvider client={queryClient}>
-				<BrowserRouter >
+				<HashRouter basename='/'>
 					<ResponsiveAppBar></ResponsiveAppBar>
 					<Box
 						component="main"
@@ -54,7 +54,7 @@ const App = () => {
 						</Routes>
 					</Box>
 
-				</BrowserRouter>
+				</HashRouter>
 			</QueryClientProvider>
 
 		</Box>
