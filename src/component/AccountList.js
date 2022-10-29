@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
@@ -7,74 +7,24 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useQuery } from 'react-query'
 
 import { getAccountList } from '../services/account';
-import { APIStatus } from '../lib/common';
-import { useSnackbar } from 'notistack';
 
-const AccountList = ({
-    reload
-}) => {
+const AccountList = () => {
 
-    const [state, setState] = useState({
-        data: [],
-        isLoading: false,
-        message: ""
-    });
-    const { enqueueSnackbar } = useSnackbar()
+    const { isLoading, data:queryData } = useQuery(['account-data'], async () => {
+        return await getAccountList();
+    })
 
-    const getData = async () => {
-        try {
-            const res = await getAccountList();
-            if (res.status === APIStatus.OK) {
-                setState(prev => {
-                    return {
-                        data: [...res.data].reverse(),
-                        isLoading: false,
-                        message: ""
-                    }
-                })
-            }
-            else {
-                console.log(res)
-                setState(prev => {
-                    return {
-                        ...prev,
-                        isLoading: false,
-                        message: res.message,
-                    }
-                })
-            }
-        } catch (error) {
-            console.log(error);
-            enqueueSnackbar(error.message, {
-                variant: 'error',
-            });
-            setState(prev => {
-                return {
-                    ...prev,
-                    isLoading: false,
-                }
-            })
-        }
-    }
-
-    useEffect(() => {
-        setState(prev => {
-            return {
-                data: [],
-                isLoading: true,
-            }
-        })
-        getData();
-    }, [reload])
+    const {status, data, message} = queryData || {}
 
     return (
         <Paper
             sx={{
                 maxHeight: "35rem",
                 padding: 2,
-                overflow:"auto"
+                overflow: "auto"
             }}
         >
             <Box
@@ -87,7 +37,7 @@ const AccountList = ({
                 Tài khoản đã tạo
             </Box>
             <List>
-                {state.isLoading && (
+                {isLoading && (
                     <Box
                         sx={{
                             display: "flex",
@@ -98,7 +48,7 @@ const AccountList = ({
                         <CircularProgress />
                     </Box>
                 )}
-                {state.data.map((item, index) => {
+                {!isLoading && data.map((item, index) => {
                     return (
                         <ListItem key={item.username}>
                             <ListItemAvatar>
